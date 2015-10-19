@@ -5,10 +5,12 @@ package com.sleepbot.datetimepicker.time;
  */
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
@@ -45,6 +47,9 @@ public class RadialTimeView extends LinearLayout implements RadialPickerLayout.O
     private int mHour2;
     private int mMinute2;
 
+    private Drawable mImageIcon;
+    private Drawable mImageIcon2;
+
     private boolean mAllowAutoAdvance = true;
 //    private int mFirstText;
 
@@ -74,6 +79,9 @@ public class RadialTimeView extends LinearLayout implements RadialPickerLayout.O
 
             mHour2 = a.getInt(R.styleable.Clock_hour2, 0);
             mMinute2 = a.getInt(R.styleable.Clock_minute2, 0);
+
+            mImageIcon = a.getDrawable(R.styleable.Clock_imageicon);
+            mImageIcon2 = a.getDrawable(R.styleable.Clock_imageicon2);
         } finally {
             // release the TypedArray so that it can be reused.
             a.recycle();
@@ -97,6 +105,7 @@ public class RadialTimeView extends LinearLayout implements RadialPickerLayout.O
             mTimeTextView[i].mMinuteView = (TextView) row.findViewById(R.id.minutes);
             mTimeTextView[i].mAmPmTextView = (TextView) row.findViewById(R.id.ampm_label);
             mTimeTextView[i].mAmPmTextView.setVisibility(View.GONE);
+            mTimeTextView[i].mImageIcon = (ImageView) row.findViewById(R.id.image_icon);
 
             mTimeTextView[i].mHourView.setOnClickListener(new OnClickListener() {
                 @Override
@@ -104,6 +113,7 @@ public class RadialTimeView extends LinearLayout implements RadialPickerLayout.O
                     setCurrentView(j);
                     setTextViewColorBlack(mTimeTextView, j);
                     setCurrentItemShowing(HOUR_INDEX, true, false, true);
+                    mTimePicker.setTime(getTimeText(j, true), getTimeText(j, false));
                 }
             });
             mTimeTextView[i].mMinuteView.setOnClickListener(new OnClickListener() {
@@ -112,9 +122,13 @@ public class RadialTimeView extends LinearLayout implements RadialPickerLayout.O
                     setCurrentView(j);
                     setTextViewColorBlack(mTimeTextView, j);
                     setCurrentItemShowing(MINUTE_INDEX, true, false, true);
+                    mTimePicker.setTime(getTimeText(j, true), getTimeText(j, false));
                 }
             });
         }
+
+        mTimeTextView[0].mImageIcon.setImageDrawable(mImageIcon);
+        mTimeTextView[1].mImageIcon.setImageDrawable(mImageIcon2);
 
         setCurrentView(1);
         setHour(mHour2, false);
@@ -122,13 +136,6 @@ public class RadialTimeView extends LinearLayout implements RadialPickerLayout.O
 
         setCurrentView(0);
         setTextViewColorBlack(mTimeTextView, 0);
-
-//        mHourView = (TextView) findViewById(R.id.hours);
-//        mHourSpaceView = (TextView) findViewById(R.id.hour_space);
-//        mMinuteSpaceView = (TextView) findViewById(R.id.minutes_space);
-//        mMinuteView = (TextView) findViewById(R.id.minutes);
-//        mAmPmTextView = (TextView) findViewById(R.id.ampm_label);
-//        mAmPmTextView.setVisibility(View.GONE);
 
         setHour(mHour, false);
         setMinute(mMinute);
@@ -139,6 +146,10 @@ public class RadialTimeView extends LinearLayout implements RadialPickerLayout.O
 
         setCurrentItemShowing(HOUR_INDEX, false, true, true);
         mTimePicker.invalidate();
+    }
+
+    public int getTimeText(final int i, boolean isHour) {
+        return isHour ? Integer.parseInt(mTimeTextView[i].mHourView.getText().toString()) : Integer.parseInt(mTimeTextView[i].mMinuteView.getText().toString());
     }
 
     private void setTextViewColorBlack(final TimeText[]timeTextView, final int i) {
@@ -236,5 +247,6 @@ public class RadialTimeView extends LinearLayout implements RadialPickerLayout.O
         TextView mMinuteView;
         TextView mMinuteSpaceView;
         TextView mAmPmTextView;
+        ImageView mImageIcon;
     }
 }

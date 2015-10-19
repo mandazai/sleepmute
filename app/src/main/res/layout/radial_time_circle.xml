@@ -13,8 +13,12 @@
         android:layout_gravity="center"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        custom:hour="23"
+        custom:hour="22"
         custom:minute="30"
+        custom:hour2="07"
+        custom:minute2="00"
+        custom:imageicon="@drawable/airplane_on"
+        custom:imageicon2="@drawable/airplane_off"
         />
 
 </LinearLayout>

@@ -115,4 +115,21 @@
             android:layout_alignBaseline="@+id/separator"
             style="@style/ampm_label"
             android:importantForAccessibility="no" />
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_alignRight="@+id/hour_space"
+        android:layout_alignLeft="@+id/hour_space"
+        android:layout_marginLeft="@dimen/extra_icon_label_margin"
+        android:layout_marginRight="@dimen/extra_icon_label_margin"
+        android:layout_centerVertical="true" >
+        <ImageView
+            android:id="@+id/image_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/blue"
+            android:layout_gravity="center_vertical"
+            />
+    </FrameLayout>
   </RelativeLayout>

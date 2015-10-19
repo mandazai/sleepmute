@@ -20,5 +20,8 @@
 
         <attr name="hour2" format="integer"/>
         <attr name="minute2" format="integer"/>
+
+        <attr name="imageicon" format="integer"/>
+        <attr name="imageicon2" format="integer"/>
     </declare-styleable>
 </resources>
