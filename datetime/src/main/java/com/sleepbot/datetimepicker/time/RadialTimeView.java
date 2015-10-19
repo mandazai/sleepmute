@@ -10,6 +10,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import com.fourmob.datetimepicker.R;
 import com.fourmob.datetimepicker.Utils;
@@ -31,7 +33,8 @@ public class RadialTimeView extends LinearLayout implements RadialPickerLayout.O
     private TextView mHourSpaceView;
     private TextView mMinuteView;
     private TextView mMinuteSpaceView;
-    private TextView mAmPmTextView;
+
+    private TimeText[] mTimeTextView = new TimeText[2];
 
     private int mBlue;
     private int mBlack;
@@ -39,7 +42,11 @@ public class RadialTimeView extends LinearLayout implements RadialPickerLayout.O
     private int mHour;
     private int mMinute;
 
+    private int mHour2;
+    private int mMinute2;
+
     private boolean mAllowAutoAdvance = true;
+//    private int mFirstText;
 
     private RadialPickerLayout mTimePicker;
     public RadialTimeView(Context context) {
@@ -64,6 +71,9 @@ public class RadialTimeView extends LinearLayout implements RadialPickerLayout.O
 
             mHour = a.getInt(R.styleable.Clock_hour, 0);
             mMinute = a.getInt(R.styleable.Clock_minute, 0);
+
+            mHour2 = a.getInt(R.styleable.Clock_hour2, 0);
+            mMinute2 = a.getInt(R.styleable.Clock_minute2, 0);
         } finally {
             // release the TypedArray so that it can be reused.
             a.recycle();
@@ -75,12 +85,50 @@ public class RadialTimeView extends LinearLayout implements RadialPickerLayout.O
         setGravity(Gravity.CENTER);
         LayoutInflater.from(context).inflate(R.layout.time_view_merge, this);
 
-        mHourView = (TextView) findViewById(R.id.hours);
-        mHourSpaceView = (TextView) findViewById(R.id.hour_space);
-        mMinuteSpaceView = (TextView) findViewById(R.id.minutes_space);
-        mMinuteView = (TextView) findViewById(R.id.minutes);
-        mAmPmTextView = (TextView) findViewById(R.id.ampm_label);
-        mAmPmTextView.setVisibility(View.GONE);
+        TableLayout tableLayout = (TableLayout)findViewById(R.id.time_table);
+
+        for (int i = 0; i < tableLayout.getChildCount(); i++) {
+            final int j = i;
+            RelativeLayout row = (RelativeLayout) tableLayout.getChildAt(i);
+            mTimeTextView[i] = new TimeText();
+            mTimeTextView[i].mHourView = (TextView) row.findViewById(R.id.hours);
+            mTimeTextView[i].mHourSpaceView = (TextView) row.findViewById(R.id.hour_space);
+            mTimeTextView[i].mMinuteSpaceView = (TextView) row.findViewById(R.id.minutes_space);
+            mTimeTextView[i].mMinuteView = (TextView) row.findViewById(R.id.minutes);
+            mTimeTextView[i].mAmPmTextView = (TextView) row.findViewById(R.id.ampm_label);
+            mTimeTextView[i].mAmPmTextView.setVisibility(View.GONE);
+
+            mTimeTextView[i].mHourView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setCurrentView(j);
+                    setTextViewColorBlack(mTimeTextView, j);
+                    setCurrentItemShowing(HOUR_INDEX, true, false, true);
+                }
+            });
+            mTimeTextView[i].mMinuteView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setCurrentView(j);
+                    setTextViewColorBlack(mTimeTextView, j);
+                    setCurrentItemShowing(MINUTE_INDEX, true, false, true);
+                }
+            });
+        }
+
+        setCurrentView(1);
+        setHour(mHour2, false);
+        setMinute(mMinute2);
+
+        setCurrentView(0);
+        setTextViewColorBlack(mTimeTextView, 0);
+
+//        mHourView = (TextView) findViewById(R.id.hours);
+//        mHourSpaceView = (TextView) findViewById(R.id.hour_space);
+//        mMinuteSpaceView = (TextView) findViewById(R.id.minutes_space);
+//        mMinuteView = (TextView) findViewById(R.id.minutes);
+//        mAmPmTextView = (TextView) findViewById(R.id.ampm_label);
+//        mAmPmTextView.setVisibility(View.GONE);
 
         setHour(mHour, false);
         setMinute(mMinute);
@@ -91,19 +139,18 @@ public class RadialTimeView extends LinearLayout implements RadialPickerLayout.O
 
         setCurrentItemShowing(HOUR_INDEX, false, true, true);
         mTimePicker.invalidate();
+    }
 
-        mHourView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setCurrentItemShowing(HOUR_INDEX, true, false, true);
-            }
-        });
-        mMinuteView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setCurrentItemShowing(MINUTE_INDEX, true, false, true);
-            }
-        });
+    private void setTextViewColorBlack(final TimeText[]timeTextView, final int i) {
+        timeTextView[(i + 1) % 2].mHourView.setTextColor(mBlack);
+        timeTextView[(i + 1) % 2].mMinuteView.setTextColor(mBlack);
+    }
+
+    private void setCurrentView(final int i) {
+        mHourView = mTimeTextView[i].mHourView;
+        mHourSpaceView = mTimeTextView[i].mHourSpaceView;
+        mMinuteSpaceView = mTimeTextView[i].mMinuteSpaceView;
+        mMinuteView = mTimeTextView[i].mMinuteView;;
     }
     // Show either Hours or Minutes.
     private void setCurrentItemShowing(int index, boolean animateCircle, boolean delayLabelAnimate,
@@ -181,5 +228,13 @@ public class RadialTimeView extends LinearLayout implements RadialPickerLayout.O
         } else if (pickerIndex == MINUTE_INDEX) {
             setMinute(newValue);
         }
+    }
+
+    static class TimeText {
+        TextView mHourView;
+        TextView mHourSpaceView;
+        TextView mMinuteView;
+        TextView mMinuteSpaceView;
+        TextView mAmPmTextView;
     }
 }
