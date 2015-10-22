@@ -5,7 +5,7 @@
     android:orientation="horizontal" >
 
     <Switch
-        android:id="@+id/switch_airplane"
+        android:id="@+id/switch_button"
         android:switchTextAppearance="@android:style/TextAppearance.Small.Inverse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

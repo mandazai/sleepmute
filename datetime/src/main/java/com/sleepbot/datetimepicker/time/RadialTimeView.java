@@ -152,6 +152,14 @@ public class RadialTimeView extends LinearLayout implements RadialPickerLayout.O
         return isHour ? Integer.parseInt(mTimeTextView[i].mHourView.getText().toString()) : Integer.parseInt(mTimeTextView[i].mMinuteView.getText().toString());
     }
 
+    public void setTimeText(int startHour, int startMinute, int endHour, int endMinute) {
+        setText(true, 0, startHour);
+        setText(false, 0, startMinute);
+        setText(true, 1, endHour);
+        setText(false, 1, endMinute);
+        mTimePicker.setTime(startHour, startMinute);
+    }
+
     private void setTextViewColorBlack(final TimeText[]timeTextView, final int i) {
         timeTextView[(i + 1) % 2].mHourView.setTextColor(mBlack);
         timeTextView[(i + 1) % 2].mMinuteView.setTextColor(mBlack);
@@ -200,6 +208,17 @@ public class RadialTimeView extends LinearLayout implements RadialPickerLayout.O
         pulseAnimator.start();
     }
 
+    private void setText(boolean isHour, int index, int value) {
+        CharSequence text = String.format(Locale.getDefault(), "%02d", value);
+        if (isHour) {
+            mTimeTextView[index].mHourView.setText(text);
+            mTimeTextView[index].mHourSpaceView.setText(text);
+        } else {
+            mTimeTextView[index].mMinuteView.setText(text);
+            mTimeTextView[index].mMinuteSpaceView.setText(text);
+        }
+
+    }
 
     private void setHour(int value, boolean announce) {
         String format;
