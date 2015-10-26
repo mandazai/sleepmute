@@ -17,8 +17,8 @@
         custom:minute="30"
         custom:hour2="07"
         custom:minute2="00"
-        custom:imageicon="@drawable/airplane_on"
-        custom:imageicon2="@drawable/airplane_off"
+        custom:imageicon="@drawable/mute"
+        custom:imageicon2="@drawable/speaker"
         />
 
 </LinearLayout>

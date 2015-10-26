@@ -22,9 +22,6 @@ public class PollService extends IntentService {
     public static final String PREF_END_HOUR = "end_hour";
     public static final String PREF_END_MINUTE = "end_minute";
 
-    private static final int AIRPLANE_ON_MSG = 1;
-    private static final int AIRPLANE_OFF_MSG = 2;
-
     private static long firstInterval;
     private static long nightInterval;
     private static long dayInterval;
@@ -42,23 +39,30 @@ public class PollService extends IntentService {
 
     @Override
     public void onHandleIntent(Intent intent) {
+        Log.d(TAG, "onHandleIntent");
         if (firstInterval == 0) {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            mStartHour = prefs.getInt(PollService.PREF_START_HOUR, 0);
-            mStartMinute = prefs.getInt(PollService.PREF_START_MINUTE, 0);
-            mEndHour = prefs.getInt(PollService.PREF_END_HOUR, 0);
-            mEndMinute = prefs.getInt(PollService.PREF_END_MINUTE, 0);
-            setAirplaneTime(mStartHour, mStartMinute, mEndHour, mEndMinute);
-            setServiceAlarm(getApplicationContext(), true);
-            return;
+            calculateInterval(this);
+            isDay = !isDay;
         }
+        setMute();
 
-        Log.d(TAG, "auto airplane run");
+        setServiceAlarm(getApplicationContext(), true);
+        isDay = !isDay;
+    }
 
+    public static void calculateInterval(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        mStartHour = prefs.getInt(PollService.PREF_START_HOUR, 0);
+        mStartMinute = prefs.getInt(PollService.PREF_START_MINUTE, 0);
+        mEndHour = prefs.getInt(PollService.PREF_END_HOUR, 0);
+        mEndMinute = prefs.getInt(PollService.PREF_END_MINUTE, 0);
+        setAirplaneTime(mStartHour, mStartMinute, mEndHour, mEndMinute);
+    }
+
+    private void setMute() {
         AudioManager audioManager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
         if (isDay) {
             firstInterval = nightInterval;
-
             //mute audio
             audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
             Log.d(TAG, "airplane on");
@@ -67,8 +71,6 @@ public class PollService extends IntentService {
             audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
             Log.d(TAG, "airplane off");
         }
-        setServiceAlarm(getApplicationContext(), true);
-        isDay = !isDay;
     }
 
     public static void setAirplaneTime(int startHour, int startMinute, int endHour, int endMinute) {
@@ -91,7 +93,7 @@ public class PollService extends IntentService {
 
         if (isOn) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                alarmManager.setExact(AlarmManager.RTC_WAKEUP, firstInterval + System.currentTimeMillis(), pi);
+                alarmManager.setExact(AlarmManager.RTC, firstInterval + System.currentTimeMillis(), pi);
             } else {
                 alarmManager.set(AlarmManager.RTC, firstInterval + System.currentTimeMillis(), pi);
             }

@@ -8,6 +8,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
@@ -46,17 +47,20 @@ public class MainActivity extends FragmentActivity {
         Switch switchButton = (Switch) view.findViewById(R.id.switch_button);
         if (mAirplaneMode) {
             switchButton.setChecked(true);
+            enableDisableViewGroup(mTimeView, false);
         }
         switchButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 // do anything here on check changed
                 if (isChecked) {
+                    enableDisableViewGroup(mTimeView, false);
                     setTimeAirModeOn();
                     PollService.setAirplaneTime(mStartHour, mStartMinute, mEndHour, mEndMinute);
                     PollService.setServiceAlarm(MainActivity.this, true);
                     saveTimePreferences(mStartHour, mStartMinute, mEndHour, mEndMinute);
                 } else {
+                    enableDisableViewGroup(mTimeView, true);
                     PollService.setServiceAlarm(MainActivity.this, false);
                     saveAirplaneMode(false);
                 }
@@ -98,19 +102,14 @@ public class MainActivity extends FragmentActivity {
         mAirplaneMode = prefs.getBoolean(PollService.PREF_IS_ALARM_ON, false);
     }
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.switch_airplane) {
-//
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
+    public static void enableDisableViewGroup(ViewGroup viewGroup, boolean enabled) {
+        int childCount = viewGroup.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View view = viewGroup.getChildAt(i);
+            view.setEnabled(enabled);
+            if (view instanceof ViewGroup) {
+                enableDisableViewGroup((ViewGroup) view, enabled);
+            }
+        }
+    }
 }
