@@ -23,8 +23,6 @@ public class PollService extends IntentService {
     public static final String PREF_END_MINUTE = "end_minute";
 
     private static long firstInterval;
-    private static long nightInterval;
-    private static long dayInterval;
 
     private static int mStartHour;
     private static int mStartMinute;
@@ -40,14 +38,12 @@ public class PollService extends IntentService {
     @Override
     public void onHandleIntent(Intent intent) {
         Log.d(TAG, "onHandleIntent");
-        if (firstInterval == 0) {
-            calculateInterval(this);
-            isDay = !isDay;
-        }
+        calculateInterval(this);
+        isDay = !isDay;
+
         setMute();
 
         setServiceAlarm(getApplicationContext(), true);
-        isDay = !isDay;
     }
 
     public static void calculateInterval(Context context) {
@@ -62,12 +58,10 @@ public class PollService extends IntentService {
     private void setMute() {
         AudioManager audioManager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
         if (isDay) {
-            firstInterval = nightInterval;
             //mute audio
             audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
             Log.d(TAG, "airplane on");
         } else {
-            firstInterval = dayInterval;
             audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
             Log.d(TAG, "airplane off");
         }
@@ -76,10 +70,8 @@ public class PollService extends IntentService {
     public static void setAirplaneTime(int startHour, int startMinute, int endHour, int endMinute) {
         Utils.Interval intervals = Utils.getInterval(startHour, startMinute, endHour, endMinute);
         firstInterval = intervals.first;
-        nightInterval = intervals.night;
-        dayInterval = intervals.day;
         isDay = intervals.isDay;
-        Log.d(TAG, "firstInterval: " + firstInterval + " nightInterval: " + nightInterval + " dayInterval: " + dayInterval + " isDay: " + isDay);
+        Log.d(TAG, "firstInterval: " + firstInterval + " isDay: " + isDay);
     }
     
     public static void setServiceAlarm(Context context, boolean isOn) {
@@ -93,9 +85,9 @@ public class PollService extends IntentService {
 
         if (isOn) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                alarmManager.setExact(AlarmManager.RTC, firstInterval + System.currentTimeMillis(), pi);
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, firstInterval + System.currentTimeMillis(), pi);
             } else {
-                alarmManager.set(AlarmManager.RTC, firstInterval + System.currentTimeMillis(), pi);
+                alarmManager.set(AlarmManager.RTC_WAKEUP, firstInterval + System.currentTimeMillis(), pi);
             }
 
         } else {
